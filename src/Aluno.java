@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 
 
 @SuppressWarnings("unused")
@@ -13,13 +14,7 @@ public class Aluno {
     public Aluno(String nome, LocalDate nascimento, String matricula) {
         this.setNome(nome);
         this.setNascimento(nascimento.getYear(), nascimento.getMonthValue(), nascimento.getDayOfMonth());
-        this.matricula = matricula;
-    }
-
-    public Aluno(String nome, LocalDate nascimento) {
-        this.setNome(nome);
-        this.setNascimento(nascimento.getYear(), nascimento.getMonthValue(), nascimento.getDayOfMonth());
-        this.setMatricula();
+        this.setMatricula(matricula);
     }
 
     public String getNome() {
@@ -47,38 +42,27 @@ public class Aluno {
     }
 
     public void setMatricula(String matricula) {
-        if (matricula.matches(this.getMaskMatricula())) {
+        if (matricula.matches(Formatos.MATRICULA.getFormato())) {
             this.matricula = matricula;
             return;
         }
         throw new IllegalArgumentException("A matrícula inserida é inválida");
     }
 
-    public void setMatricula() {
-        StringBuilder matricula = new StringBuilder();
-
-        String[] dezNumeros = new String[10];
-        // Obtendo 10 números
-        for (int index = 0; index < 10; index++) {
-            dezNumeros[index] = Integer.toString((int) (Math.floor(Math.random() * (10))));
-        }
-
-        // Formatando
-        for (int index = 0; index < 10; index++){
-            if (index != 2 && index != 5){
-                matricula.append(dezNumeros[index]);
-            } else {
-                matricula.append(dezNumeros[index] + "-");
-            }
-        }
-
-        this.matricula = matricula.toString();
-    }
-
     // Métodos
-    private String getMaskMatricula(){
-        // Formato: XXX-XXX-XXXX (Apenas digitos)
-        return "^[0-9]{3}-[0-9]{3}-[0-9]{4}$";
-    }
 
+    public void getInfo(){
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern(Formatos.DATA.getFormato());
+
+        int idade = this.getIdade();
+        String nascimento = formatador.format(this.getNascimento());
+        String matricula = this.getMatricula();
+
+        Visuals.printHeader("INFORMAÇÕES: " + this.getNome());
+        System.out.printf("""
+                Matrícula: %s
+                Data de nascimento: %s
+                Idade: %d
+                """, matricula, nascimento, idade);
+    }
 }
